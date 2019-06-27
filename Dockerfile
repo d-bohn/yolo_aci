@@ -35,5 +35,4 @@ ADD ./assets/yolo_video.py /opt/yolo
 RUN cd /opt/yolo/yolo-coco && \
     wget https://pjreddie.com/media/files/yolov3.weights
 
-# WORKDIR ["/opt/yolo"]
 ENTRYPOINT ["/bin/bash"]
