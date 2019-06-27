@@ -9,9 +9,9 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     python3-dev python3-pip \
     git g++ wget make cmake \
-    libopencv-dev
+    libopencv-dev python3-setuptools
 
-RUN pip3 install setuptools opencv-python imutils
+RUN pip3 install opencv-python imutils
 
 RUN cd /opt && \
     git clone https://github.com/pjreddie/darknet && \
