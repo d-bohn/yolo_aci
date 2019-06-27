@@ -11,7 +11,7 @@ RUN apt-get update && \
     git g++ wget make cmake \
     libopencv-dev
 
-RUN pip3 install opencv-python
+RUN pip3 install opencv-python imutils
 
 RUN cd /opt && \
     git clone https://github.com/pjreddie/darknet && \
@@ -34,5 +34,5 @@ ADD ./assets/yolo_video.py /opt/yolo
 RUN cd /opt/yolo/yolo-coco && \
     wget https://pjreddie.com/media/files/yolov3.weights
 
-WORKDIR ["/opt/yolo"]
+# WORKDIR ["/opt/yolo"]
 ENTRYPOINT ["/bin/bash"]
