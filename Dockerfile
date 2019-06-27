@@ -11,7 +11,7 @@ RUN apt-get update && \
     git g++ wget make cmake \
     libopencv-dev
 
-RUN pip3 install opencv-python imutils
+RUN pip3 install setuptools opencv-python imutils
 
 RUN cd /opt && \
     git clone https://github.com/pjreddie/darknet && \
