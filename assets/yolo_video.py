@@ -8,6 +8,7 @@ import imutils
 import time
 import cv2
 import os
+import csv
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -16,9 +17,13 @@ ap.add_argument("-i", "--input", required=True,
 ap.add_argument("-o", "--output", required=True,
 	help="path to output video")
 ap.add_argument("-y", "--yolo", required=True,
-	help="base path to YOLO directory")
+	help="base path to YOLO directory"),
+ap.add_argument("-w", "--write_res", required=True,
+	help="where to write results"),
+ap.add_argument("-cvt", "--pref_target",
+	help="cv target", default = "cv2.dnn.DNN_TARGET_OPENCL"),
 ap.add_argument("-c", "--confidence", type=float, default=0.5,
-	help="minimum probability to filter weak detections")
+	help="minimum probability to filter weak detections"),
 ap.add_argument("-t", "--threshold", type=float, default=0.3,
 	help="threshold when applyong non-maxima suppression")
 args = vars(ap.parse_args())
@@ -40,6 +45,13 @@ configPath = os.path.sep.join([args["yolo"], "yolov3.cfg"])
 # and determine only the *output* layer names that we need from YOLO
 print("[INFO] loading YOLO from disk...")
 net = cv2.dnn.readNetFromDarknet(configPath, weightsPath)
+net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
+
+if args["pref_target"] == "cv2.dnn.DNN_TARGET_OPENCL":
+	net.setPreferableTarget(cv2.dnn.DNN_TARGET_OPENCL)
+else:
+	net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+
 ln = net.getLayerNames()
 ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
@@ -125,6 +137,12 @@ while True:
 				confidences.append(float(confidence))
 				classIDs.append(classID)
 
+				# save to file
+				fields=np.column_stack((boxes,confidences,classIDs))
+				with open(args["write_res"], 'a') as f:
+					writer_csv = csv.writer(f)
+					writer_csv.writerow(fields)
+
 	# apply non-maxima suppression to suppress weak, overlapping
 	# bounding boxes
 	idxs = cv2.dnn.NMSBoxes(boxes, confidences, args["confidence"],
@@ -162,6 +180,17 @@ while True:
 
 	# write the output frame to disk
 	writer.write(frame)
+
+# Write results
+
+# boxesf = [item for sublist in boxes for item in sublist]
+# confidencesf = [item for sublist in confidences for item in sublist]
+# classIDsf = [item for sublist in classIDs for item in sublist]
+# data = np.array([boxesf, confidence, classIDs])
+# data = np.column_stack((boxesf, confidencesf, classIDsf))
+# np.savetxt(args["write_res"]+"_bb.csv", boxes, delimiter = ',')
+# np.savetxt(args["write_res"]+"_conf.csv", confidences, delimiter = ',')
+# np.savetxt(args["write_res"]+"_clid.csv", classIDs, delimiter = ',')
 
 # release the file pointers
 print("[INFO] cleaning up...")

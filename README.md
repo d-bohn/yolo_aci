@@ -26,5 +26,7 @@ python yolo.py --image /path/to/image.jpg --yolo yolo-coco
 #### Video
 ```
 python3 yolo_video.py --input /path/to/vid.mp4 \
-	--output /path/to/output/save.avi --yolo yolo-coco
+	--output /path/to/output/save.avi \
+	--write_res /path/to/write/results.txt \
+	--yolo yolo-coco
   ```
